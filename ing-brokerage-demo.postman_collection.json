@@ -1,0 +1,398 @@
+{
+	"info": {
+		"_postman_id": "1d1de22e-a57e-4b29-92f1-bbe6aedf908a",
+		"name": "ing-brokerage-demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2904000",
+		"_collection_link": "https://lively-meteor-911508.postman.co/workspace/Agri-request-service~4c616692-593c-4185-8c03-4c3614692ab0/collection/2904000-1d1de22e-a57e-4b29-92f1-bbe6aedf908a?action=share&source=collection_link&creator=2904000"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"ahmet1\",\n  \"password\": \"ahmet\",\n  \"role\": \"ROLE_USER\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/auth/register' \\\n  -H 'accept: */*' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"username\": \"ahmet\",\n  \"password\": \"ahmet\",\n  \"role\": \"ROLE_USER\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"",
+							"// Save the access token to an environment variable",
+							"pm.environment.set(\"accessToken\", jsonData.accessToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"ahmet1\",\n  \"password\": \"ahmet\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/auth/login' \\\n  -H 'accept: */*' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"username\": \"ahmet\",\n  \"password\": \"ahmet\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "List Customer",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/auth/customers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth",
+						"customers"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8080/api/auth/customers' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Baerar {{accessToken}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": 33,\n  \"size\": 11\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/assets/deposit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"deposit"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/assets/deposit' \\\n  -H 'accept: */*' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"customerId\": 31,\n  \"size\": 10\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Withdraw",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": 33,\n  \"size\": 1,\n  \"iban\": \"XXX\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/assets/withdraw",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"withdraw"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/assets/withdraw' \\\n  -H 'accept: */*' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"customerId\": 33,\n  \"amount\": 10,\n  \"iban\": \"XXX\"\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "ListOrder",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/order?page=0&size=10&sort=createDate%2Cdesc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"order"
+					],
+					"query": [
+						{
+							"key": "customerId",
+							"value": "34",
+							"disabled": true
+						},
+						{
+							"key": "status",
+							"value": "PENDING",
+							"disabled": true
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "sort",
+							"value": "createDate%2Cdesc"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8080/api/order?customerId=34&status=PENDING&page=0&size=10&sort=createDate%2Cdesc' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": 33,\n  \"assetName\": \"DEF\",\n  \"orderSide\": \"BUY\",\n  \"size\": 1,\n  \"price\": 10\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/order",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"order"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/order' \\\n  -H 'accept: */*' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"customerId\": 34,\n  \"assetName\": \"ABC\",\n  \"orderSide\": \"BUY\",\n  \"size\": 1,\n  \"price\": 10\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/order/cancel/193",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"order",
+						"cancel",
+						"193"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/order/cancel/1' \\\n  -H 'accept: */*' \\\n  -d ''"
+			},
+			"response": []
+		},
+		{
+			"name": "List Asset",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/assets/33",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"assets",
+						"33"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8080/api/assets/33' \\\n  -H 'accept: */*'"
+			},
+			"response": []
+		}
+	]
+}
