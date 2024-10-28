@@ -11,6 +11,7 @@ import com.ing.brokerage.domain.asset.infrastructure.rest.command.WithdrawReques
 import com.ing.brokerage.common.ASSET;
 import com.ing.brokerage.domain.order.application.event.OrderCanceledEvent;
 import com.ing.brokerage.domain.order.application.event.OrderCreatedEvent;
+import com.ing.brokerage.domain.order.application.event.OrderMatchedEvent;
 import com.ing.brokerage.domain.order.domain.info.OrderSide;
 import com.ing.brokerage.domain.order.domain.model.Order;
 import org.springframework.stereotype.Service;
@@ -121,5 +122,33 @@ public class AssetService {
     public List<AssetDto> listAsset(Long customerId) {
 
         return assetRepository.listAssetByCustomer(customerId);
+    }
+
+    public void handleOrderMatch(OrderMatchedEvent orderMatchedEvent) throws DomainException {
+
+        Asset asset = assetRepository.retrieveAsset(
+                orderMatchedEvent.getOrder().customerId(),
+                orderMatchedEvent.getOrder().assetName()
+        ).orElseThrow(() -> new AssetNotFoundException(
+                "Asset not found for customer ID: " + orderMatchedEvent.getOrder().customerId() +
+                        " and asset name: " +  orderMatchedEvent.getOrder().assetName()
+        ));
+
+
+        Asset mainAsset = assetRepository.retrieveAsset(
+                orderMatchedEvent.getOrder().customerId(),
+                ASSET.TRY.name()
+        ).orElseThrow(() -> new AssetNotFoundException(
+                "Asset not found for customer ID: " + orderMatchedEvent.getOrder().customerId() +
+                        " and asset name: " +  ASSET.TRY.name()
+        ));
+
+        Order order = orderMatchedEvent.getOrder();
+        asset.deductForOrderReservationForMatch(order.orderSide(),order.size());
+        mainAsset.updateSufficientFundsOrSharesForMatch(order.orderSide(),order.size(), order.price());
+
+        assetRepository.save(asset);
+        assetRepository.save(mainAsset);
+
     }
 }

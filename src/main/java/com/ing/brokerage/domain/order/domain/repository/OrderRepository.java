@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository {
@@ -13,4 +14,6 @@ public interface OrderRepository {
     void save(Order order);
     Optional<Order> retrieveOrder(Long orderId);
     Page<Order> listOrder(Long customerId, OrderStatus status, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    List<Order> fetchPendingOrders();
 }

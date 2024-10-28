@@ -6,6 +6,7 @@ import com.ing.brokerage.common.AggregateRoot;
 import com.ing.brokerage.common.DomainException;
 import com.ing.brokerage.common.SecurityUtil;
 import com.ing.brokerage.domain.asset.domain.exception.UnauthorizedAccessException;
+import com.ing.brokerage.domain.order.application.event.OrderMatchedEvent;
 import com.ing.brokerage.domain.order.domain.exception.InvalidOrderStateException;
 import com.ing.brokerage.domain.order.domain.info.OrderId;
 import com.ing.brokerage.domain.order.domain.info.OrderSide;
@@ -98,15 +99,7 @@ public class Order extends AggregateRoot<OrderId> {
 
     public void validateForCancellation() throws DomainException {
 
-        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
-        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
-        boolean isUserRole = authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
-        if (isUserRole) {
-            if (!customerId.equals(userDetail.getUserId())) {
-                throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
-            }
-        }
+        validatePermission(customerId);
 
         if (status() != OrderStatus.PENDING) {
             throw new InvalidOrderStateException("Only pending orders can be canceled");
@@ -125,15 +118,7 @@ public class Order extends AggregateRoot<OrderId> {
 
     public void validateForNew(OrderRequest orderRequest) throws UnauthorizedAccessException {
 
-        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
-        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
-        boolean isUserRole = authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
-        if (isUserRole) {
-            if (!orderRequest.getCustomerId().equals(userDetail.getUserId())) {
-                throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
-            }
-        }
+        validatePermission(orderRequest.getCustomerId());
 
         OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(this,
                 this.customerId,
@@ -149,4 +134,25 @@ public class Order extends AggregateRoot<OrderId> {
     public void cancel() {
         this.status = OrderStatus.CANCELED;
     }
+
+    public void match() {
+        this.status = OrderStatus.MATCHED;
+        OrderMatchedEvent orderCreatedEvent = new OrderMatchedEvent(this,this);
+        this.registerEvent(orderCreatedEvent);
+    }
+
+    public void validatePermission(Long customerId) throws UnauthorizedAccessException {
+        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
+        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
+
+        boolean isUserRole = authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
+
+        if (isUserRole && !customerId.equals(userDetail.getUserId())) {
+            throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
+        }
+
+    }
+
+
 }

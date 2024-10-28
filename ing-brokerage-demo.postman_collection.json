@@ -393,6 +393,33 @@
 				"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:8080/api/assets/33' \\\n  -H 'accept: */*'"
 			},
 			"response": []
+		},
+		{
+			"name": "Match all pending orders",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/order/match-orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"order",
+						"match-orders"
+					]
+				},
+				"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:8080/api/order/match-orders' \\\n  -H 'accept: */*' \\\n  -d ''"
+			},
+			"response": []
 		}
 	]
 }

@@ -19,8 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    public static final String ADMIN = "admin";
-    public static final String USER = "user";
 
     @Autowired
     private CustomUserDetailsService userDetailsService;

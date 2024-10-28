@@ -11,6 +11,7 @@ import com.ing.brokerage.domain.asset.infrastructure.rest.command.DepositRequest
 import com.ing.brokerage.domain.asset.infrastructure.rest.command.WithdrawRequest;
 import com.ing.brokerage.common.AggregateRoot;
 import com.ing.brokerage.domain.order.domain.info.OrderSide;
+import com.ing.brokerage.domain.order.domain.model.Order;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.math.BigDecimal;
@@ -75,31 +76,15 @@ public class Asset extends AggregateRoot<AssetId> {
         if (orderSide == OrderSide.BUY) {
             this.size = this.size.add(orderSize);
         } else if (orderSide == OrderSide.SELL) {
-            this.size = this.size.subtract(orderSize);
+            this.usableSize = this.usableSize.subtract(orderSize);
         }
     }
 
-    public void restoreReservedFundsOrShares(OrderSide orderSide, BigDecimal orderSize, BigDecimal price) {
 
-        if (orderSide == OrderSide.BUY) {
-            this.size = this.size.subtract(orderSize);
-        } else if (orderSide == OrderSide.SELL) {
-            this.size = this.size.add(orderSize);
-        }
-    }
 
     public void validateForDeposit(DepositRequest depositRequest) throws DomainException {
 
-        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
-        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
-        boolean isUserRole = authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
-        if (isUserRole) {
-            if (!depositRequest.getCustomerId().equals(userDetail.getUserId())) {
-                throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
-            }
-        }
-
+        validatePermission(depositRequest.getCustomerId());
         if (depositRequest.getSize() == null || !(depositRequest.getSize().compareTo(BigDecimal.ZERO) > 0)) {
             throw new IllegalArgumentException("Deposit size must be positive");
         }
@@ -108,16 +93,7 @@ public class Asset extends AggregateRoot<AssetId> {
 
     public void validateForWithdraw(WithdrawRequest withdrawRequest) throws InsufficientBalanceException, UnauthorizedAccessException {
 
-
-        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
-        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
-        boolean isUserRole = authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
-        if (isUserRole) {
-            if (!withdrawRequest.getCustomerId().equals(userDetail.getUserId())) {
-                throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
-            }
-        }
+        validatePermission(withdrawRequest.getCustomerId());
 
         if (withdrawRequest.getSize().compareTo(BigDecimal.ZERO) <= 0) {
             throw new InsufficientBalanceException("Withdrawal amount must be greater than zero.");
@@ -134,12 +110,11 @@ public class Asset extends AggregateRoot<AssetId> {
 
     public void deposit(BigDecimal depositSize) {
         size = size.add(depositSize);
+        usableSize = size;
     }
 
     public void withdraw(BigDecimal withDrawSize) {
-
         usableSize = usableSize.subtract(withDrawSize);
-
     }
 
     public void updateSufficientFundsOrShares(OrderSide orderSide, BigDecimal amount, BigDecimal price) {
@@ -149,8 +124,41 @@ public class Asset extends AggregateRoot<AssetId> {
             usableSize = usableSize.subtract(totalCost);
         } else if (OrderSide.SELL.equals(orderSide)) {
             BigDecimal totalCost = price.multiply(amount);
-            usableSize = usableSize.add(totalCost);
+            size = size.add(totalCost);
         }
 
+    }
+
+
+    public void validatePermission(Long customerId) throws UnauthorizedAccessException {
+        CustomUserDetails userDetail = SecurityUtil.getAuthenticatedUser();
+        List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetail.getAuthorities();
+
+        boolean isUserRole = authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals(RoleEnum.ROLE_USER.name()));
+
+        if (isUserRole && !customerId.equals(userDetail.getUserId())) {
+            throw new UnauthorizedAccessException("Customer ID does not match the authenticated user's ID.");
+        }
+
+    }
+
+    public void deductForOrderReservationForMatch(OrderSide orderSide, BigDecimal size) {
+        if (orderSide == OrderSide.BUY) {
+            this.usableSize = this.usableSize.add(size);
+        } else if (orderSide == OrderSide.SELL) {
+            this.size = this.size.subtract(size);
+        }
+    }
+
+    public void updateSufficientFundsOrSharesForMatch(OrderSide orderSide, BigDecimal amount, BigDecimal price) {
+
+        if (OrderSide.BUY.equals(orderSide)) {
+            BigDecimal totalCost = price.multiply(amount);
+            size = size.subtract(totalCost);
+        } else if (OrderSide.SELL.equals(orderSide)) {
+            BigDecimal totalCost = price.multiply(amount);
+            usableSize = usableSize.add(totalCost);
+        }
     }
 }

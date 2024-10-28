@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderRepositoryImpl implements OrderRepository {
@@ -64,6 +65,11 @@ public class OrderRepositoryImpl implements OrderRepository {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable).map(item -> toDomain(item));
+    }
+
+    @Override
+    public List<Order> fetchPendingOrders() {
+       return orderEntityRepository.findByStatus(OrderStatus.PENDING).stream().map(item -> toDomain(item)).collect(Collectors.toList());
     }
 
     private OrderEntity toEntity(Order order) {

@@ -6,6 +6,7 @@ import com.ing.brokerage.domain.asset.domain.exception.AssetNotFoundException;
 import com.ing.brokerage.domain.asset.domain.exception.InsufficientBalanceException;
 import com.ing.brokerage.domain.order.application.event.OrderCanceledEvent;
 import com.ing.brokerage.domain.order.application.event.OrderCreatedEvent;
+import com.ing.brokerage.domain.order.application.event.OrderMatchedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +25,16 @@ public class OrderCreatedEventListener {
     }
 
     @EventListener
-    public void handleOrderCancellation(OrderCanceledEvent orderCanceledEvent) throws AssetNotFoundException {
+    public void handleOrderCancellation(OrderCanceledEvent orderCanceledEvent) throws DomainException {
        assetService.handleOrderCancellation(orderCanceledEvent);
     }
+
+
+    @EventListener
+    public void handleOrderMatch(OrderMatchedEvent orderMatchedEvent) throws DomainException {
+        assetService.handleOrderMatch(orderMatchedEvent);
+    }
+
+
 
 }
