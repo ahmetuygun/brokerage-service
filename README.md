@@ -10,8 +10,6 @@
 2. Authenticate with the `/login` API to get a token; the token will be saved to `{{accessToken}}` automatically.
 3. Call the APIs using the token.
 
-### Assumptions
-- Asset's ‘Usable size’ is only reflected from ‘size’ when the Order is matched.
 
 ### Architecture and Stack
 - **Stack:** Java 21, Spring Boot 3.3.5, Spring Security 6.1 , Mokito, H2 DB
@@ -22,4 +20,3 @@ I tried to implement Domain-Driven Design (DDD) and Event-Driven Design (EDD). `
 
 Some parts might seem unconventional but are required for DDD (like generating IDs and manually setting them for domain entities). I tried to explain this further in my article: [A Soft Introduction to Domain-Driven Design: From Theory to Java Code Implementation](https://medium.com/@ygnhmt/a-soft-introduction-to-domain-driven-design-from-theory-to-java-code-implementation-part-2-5aa7e1cfef65).
 
-* I couldn't expose the admin user endpoint to match pending orders because of time issues, sorry : ( 
