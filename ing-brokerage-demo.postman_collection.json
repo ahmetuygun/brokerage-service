@@ -23,7 +23,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"ahmet1\",\n  \"password\": \"ahmet\",\n  \"role\": \"ROLE_USER\"\n}"
+					"raw": "{\n  \"username\": \"ahmet2\",\n  \"password\": \"ahmet\",\n  \"role\": \"ROLE_ADMIN\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/auth/register",
@@ -73,7 +73,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"username\": \"ahmet1\",\n  \"password\": \"ahmet\"\n}"
+					"raw": "{\n  \"username\": \"ahmet2\",\n  \"password\": \"ahmet\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/auth/login",
@@ -151,7 +151,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"customerId\": 33,\n  \"size\": 11\n}"
+					"raw": "{\n  \"customerId\": 33,\n  \"size\": 100\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/assets/deposit",
@@ -301,7 +301,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"customerId\": 33,\n  \"assetName\": \"DEF\",\n  \"orderSide\": \"BUY\",\n  \"size\": 1,\n  \"price\": 10\n}"
+					"raw": "{\n  \"customerId\": 33,\n  \"assetName\": \"ABC\",\n  \"orderSide\": \"SELL\",\n  \"size\": 1,\n  \"price\": 15\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/order",
@@ -397,6 +397,16 @@
 		{
 			"name": "Match all pending orders",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -405,7 +415,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:8080/api/order/match-orders",
+					"raw": "http://localhost:8080/api/match-orders",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -413,7 +423,6 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"order",
 						"match-orders"
 					]
 				},
