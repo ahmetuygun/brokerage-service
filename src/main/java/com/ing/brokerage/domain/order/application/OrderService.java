@@ -41,6 +41,7 @@ public class OrderService {
 
     }
 
+    @Transactional
     public void cancelOrder(Long orderId) throws DomainException {
         Order order = orderRepository.retrieveOrder(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found for ID: " + orderId));
@@ -52,12 +53,13 @@ public class OrderService {
         orderRepository.save(order);
 
     }
-
+    @Transactional
     public Page<OrderInfo> listOrder(Long customerId, OrderStatus status, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         Page<Order> orders = orderRepository.listOrder(customerId, status, startDate, endDate, pageable);
         return orders.map(order -> new OrderInfo(order));
     }
 
+    @Transactional
     public void matchPendingOrders() throws DomainException {
         validatePermissionMatch();
         orderRepository.fetchPendingOrders().forEach(order -> {

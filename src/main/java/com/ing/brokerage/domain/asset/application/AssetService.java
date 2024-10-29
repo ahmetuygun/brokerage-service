@@ -15,6 +15,7 @@ import com.ing.brokerage.domain.order.application.event.OrderMatchedEvent;
 import com.ing.brokerage.domain.order.domain.info.OrderSide;
 import com.ing.brokerage.domain.order.domain.model.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -85,7 +86,7 @@ public class AssetService {
 
 
     }
-
+    @Transactional
     public void deposit(DepositRequest depositRequest) throws DomainException {
         Asset asset = assetRepository.retrieveAsset(
                 depositRequest.getCustomerId(),
@@ -102,7 +103,7 @@ public class AssetService {
         asset.deposit(depositRequest.getSize());
         assetRepository.save(asset);
     }
-
+    @Transactional
     public void withdraw(WithdrawRequest withdrawRequest) throws DomainException {
 
         Asset asset = assetRepository.retrieveAsset(
